@@ -1,0 +1,11 @@
+# remove post/comment when user-flair is not set
+type: any
+author:
+    flair_template_id (regex): ['']
+action: remove
+comment: |
+    Hey, /u/{{author}}
+ 
+    Your {{kind}} has been removed. You need to set a flair before you can post or comment.
+action_reason: "No user flair."
+moderators_exempt: true
