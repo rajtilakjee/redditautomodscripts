@@ -1,0 +1,11 @@
+# Comment '!stickey1' to pin a thread in sticky slot 1, works only for mods.
+type: comment
+author:
+    is_moderator: true
+is_top_level: true
+moderators_exempt: false
+body (full-exact): "!s1"
+parent_submission:
+    set_sticky: 1
+action: remove
+action_reason: 'Pinned the submission in slot: 1'
