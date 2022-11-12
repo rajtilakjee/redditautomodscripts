@@ -1,0 +1,7 @@
+# These are submission Keywords that are Filtered
+type: submission
+~title+body+url (includes-word, regex): ['r/mysub', 'r/my-sub', 'my sub', 'my name']
+title+body+url (includes-word, regex): ['/?r/\w+','war', 'ban']
+moderators_exempt: true  
+action: filter
+action_reason: "Words not allowed: {{match}}"
