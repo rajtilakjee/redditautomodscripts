@@ -1,0 +1,341 @@
+### Remove all bot commands
+type: comment
+body (starts-with): ["!command"]
+moderators_exempt: false
+action: remove
+set_locked: true
+action_reason: "Removing bot command by MOD"
+---
+### Remove test post
+type: submission
+title (full-exact): ["test"]
+moderators_exempt: false
+action: remove
+set_locked: true
+---
+##########------------------------------------------##########
+##### Shortcuts
+##########------------------------------------------##########
+---
+### Comment '!s1' to pin a thread in sticky slot 1, works only for mods.
+type: comment
+author:
+    is_moderator: true
+is_top_level: true
+moderators_exempt: false
+body (full-exact): "!s1"
+parent_submission:
+    set_sticky: 1
+action: remove
+action_reason: 'Pinned the submission in slot: 1'
+---
+##########------------------------------------------##########
+### Content Tagging/Sorting/Flairing Stuff Goes Here
+##########------------------------------------------##########
+---
+### Tagging OC post as OC
+type: submission
+title (includes): ["[OC]", "(OC)", "ITAP", "I made", "Original Content"]
+set_flair: 
+     template_id: 3dfde524-7ed6-11eb-af6a-0e28a28eee9f
+overwrite_flair: true
+set_original_content: true
+---
+### Tag poll post with poll flair
+type: poll submission
+set_flair: 
+     template_id: 83c2be3a-1e9b-11ec-87b3-ce55c3fedd3b
+overwrite_flair: true
+---
+### Recurring Thread comment sort to new!
+type: submission
+title (includes): ["Recurring Thread I", "Recurring Thread II"]
+set_suggested_sort: new 
+set_sticky: 2
+---
+### Marking NSFW
+type: submission
+title (includes-word): ["[NSFW]", "(NSFW)", "NSFW", "[NSFL]", "(NSFL)", "NSFL"]
+set_nsfw: true
+---
+##########------------------------------------------##########
+### Submission Control Stuff Goes Here
+##########------------------------------------------##########
+---
+### These are submission Keywords that are Filtered
+type: submission
+~title+body+url (includes-word, regex): ['r/keyword', 'keyword', 'key word']
+title+body+url (includes-word, regex): ['/?r/\w+', 'banned word']
+moderators_exempt: true
+priority: 5
+action: filter
+action_reason: "Words not allowed: {{match}}"
+---
+### Phone number spam
+type: any
+title+url+body (regex, includes): ['(\d\W?){10, }']
+action: spam
+action_reason: 'Phone number spam'
+---
+### Youtube Post spam
+type: submission
+url (includes): ['youtube.com', 'youtu.be']
+set_flair: 
+     template_id: 55a21d38-9b8e-11eb-bdf4-0e5e5d797711
+overwrite_flair: true
+action: remove
+priority: 3
+action_reason: 'Youtube Videos not allowed'
+set_locked: true
+comment: |
+   Hey u/{{author}}, Thank you for your {{kind}}!
+
+   Unfortunately your [{{kind}}]({{permalink}}) was removed.
+
+   Reason(s):
+
+   We are currently not allowing Youtube links. But you can upload your videos directly!
+---
+### user Having comment karma less than 5, their post will be removed. this is to prevent spammers.
+type: submission
+title+url+domain+body (regex, includes): ['http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+']
+~title+url+domain+body (regex, includes): ['imgur.com', 'ibb.co', 'i.redd.it', 'i.reddit.com', 'reddituploads.com','v.redd.it', 'v.reddit.com', 'r/indiasocial', 'r/indianostalgia', 'r/poharevolution', 'r/indiafood']
+author:
+    account_age: "< 1 days"
+    comment_karma: "< 10"
+    satisfy_any_threshold: true
+action: filter
+priority: 2
+action_reason: 'Submission - Low karma/ new Account'
+---
+### Link based submission check
+### users Having comment karma less than 10 and age less than 1 days, their post will be removed. this is to prevent spammers.
+#type: link submission
+#author:
+#    account_age: "< 1 days"
+#    comment_karma: "< 10"
+#    satisfy_any_threshold: true
+#action: filter
+#priority: 3
+#action_reason: 'Link - Low karma/ new Account'
+---
+### These are all blocked/spam Links.
+domain+body+title: [blocked-domain.com]
+action: spam
+action_reason: "Banned website"
+---
+### All blocked subreddit names in submission for possible META.
+type: submission
+domain+url+body+title: [r/subreddit]
+action: spam
+action_reason: "Possible Meta"
+---
+### remove post having more than 5 reports.
+reports: 5
+action: filter
+action_reason: "Multiple reports"
+---
+## Remove any reddit links in submission Title, body and url.
+type: submission
+title+url+body (regex): ['[^\s\(\)\[\]]+redd\.it/[^\s\(\)\[\]]+', '[^\s\(\)\[\]]+reddit\.com/[^\s\(\)\[\]]+']
+~domain: ['i.redd.it', 'i.reddit.com', 'reddituploads.com','v.redd.it', 'v.reddit.com']
+~title+body+url (regex): ['r/subreddit']
+action: spam
+action_reason: "Possible Reddit link in Submission"
+set_flair: 
+     template_id: 85ea163c-f4fc-11ea-a110-0ebd56c33abf
+set_locked: true
+---
+### Approve - Whitelist domains
+type: any
+body+title+domain (includes): [whitelisted-domain.com]
+action: approve
+priority: -3
+action_reason: 'Whitelist'
+---
+##########------------------------------------------##########
+### Comment Control Stuff Goes Here
+##########------------------------------------------##########
+---
+### These are Comment Filter Keywords.
+type: comment
+~author: [SubReddit]
+~body (includes-word, regex): ["approved word"]
+body (includes-word, regex): ["banned words"]
+moderators_exempt: true
+action: spam
+action_reason: "Words not allowed: {{match}}"
+---
+### Monitored words. Check context and approve, warn or ban as needed.
+type: comment
+~author: [SubReddit]
+~body (includes-word, regex): ["approved word"]
+body (includes-word, regex): ["banned words"]
+moderators_exempt: true
+action: filter
+action_reason: "Monitored Word (approve if ok): {{match}}"
+---
+### All subreddit names in comment need to be filtered.
+type: comment
+domain+url+body: [r/subreddit]
+action: remove
+action_reason: "Possible Meta"
+---
+### Link spam
+type: comment
+body (regex, includes): ['http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+']
+~body (regex, includes): ['imgur.com', 'giphy.com', 'tenor.com']
+author:
+    account_age: "< 3 days"
+    comment_karma: "< 25"
+    satisfy_any_threshold: true
+action: filter
+priority: 2
+action_reason: 'New account link spam'
+---
+### Reported comment gets removed!
+type: comment
+reports: 3
+action: filter
+action_reason: "Reported content. Please Review!"
+---
+### Gif Ids to be removed!
+type: comment
+body (regex, includes): ['JmD9mkDmzvXE7nxy7j']
+action: remove
+action_reason: 'GIF Not Allowed!'
+moderators_exempt: false
+---
+##########------------------------------------------##########
+### User Control Stuff Goes Here
+##########------------------------------------------##########
+---
+### New account limit for Discussion Thread
+type: comment
+~author: [subreddit]
+parent_submission:
+    title (regex, includes): ['Discussion Thread']
+author:
+    account_age: "< 5 hours"
+    comment_karma: "< 10"
+    satisfy_any_threshold: true
+action: remove
+action_reason: 'New DT user'
+---
+### This is main Comment Filter ###
+#### comment less than 0 karma will be removed
+type: comment
+~author: [indiasocial]
+author:
+#    account_age: "< 1 hours"
+    comment_karma: "< 0"
+#    satisfy_any_threshold: true
+action: remove
+action_reason: 'Negative karma account'
+priority: 4
+---
+### User Flair Check & remove if necessary
+type: any
+moderators_exempt: false
+author:
+    flair_text (includes-word, regex): ['chodi', 'usi', 'unitedstatesofindia', 'aakhandbharat', 'modi', 'mudi', 'hindurastra', 'samaj', 'officialindia', 'stalin', 'putin', 'bjp', 'congress', 'indiaspeaks', 'gandhi', 'amit', 'ayega', 'librandu', 'r(e|3)t(a+|@+|u)rd(|s|ed)', "lib"] 
+    set_flair: ["indiasocial", "default"]
+    overwrite_flair: true
+action: filter
+priority: 20
+action_reason: 'OP used a banned userflair: {{author_flair_text}} | It has been reset now, can approve'
+---
+### Possible troll/ spammer: check before approving
+type: any
+author: [HWIATSLGEORD, AmazingWeekend, 6zz9, sabsebadakangaal, nontoxicbob, Iloveyourboob1998, Competitive-Bag-9064, AbhilashHP, birblover69420, Lauda442, JoltikOfficial, rjainz, TotesMessenger, Nirrit, SapiosexualCXO, BanglarLok, ConsistentExternal88, study5gamer, RealRedditor100P, JawarlalNehru, Yash_saini_, Nitecrawler_69, indoriking, Smogiefoggie, BetterPhilosopher435, arc_buddha, PH0ENIX_PLAYS, Temporary_Mission_51, pak_randi_desh, 8PAbs, Ok_Durian_3015, BetterPhilosopher435, MelMarks1, levisaitama, Feisty-Ad2980]
+action: filter
+action_reason: 'Possible troll/ spammer: check before approving'
+---
+### Confirmed troll/ spammer 
+type: any
+author:
+    name: ["ConsiderationMain395", "magnificentlife505", "sarthistic", "beatricejensen", "okbuddybutbhai","healthandfitness0211", "Ewwarentyougay", "queensheeet", "notanincell_", "ShinjisUnit01", "Kidsdiypoint","Competitive-Ostrich7", "Sarcasm999_overload", "SG_A106", "batman_Gauss", "ILoveBikiniSaree", "DespicableSwtHr8", "Noobchand_ki_biwi", "noobchand", "BoomerBhaiya", "Upstairs-Guess-894", "Cool_Nilay", "Good-Bottle7238", "Visible_Contact_9958", "Zonalstories", "Aarkiasaurus", "Eithannnnn", "IWantToEatYourpussi", "azad-kashmir", "UsedCap6", "sachy0902", "investor1010", "bbesixer", "MrAyushGarg", "_wah_modiji_wah_", "Manish_1_2_3", "simp_r", "khurjabulandt", "Boob_Chand", "recrusk", "Altruistic-Plan-2063", "Trans-phobic", "throwawayinsfi", "Rey_84", "bullybuttermasala", "mbo2o", "No-Preparation9253", "commentover", "awwtf456", "FrostyCandle708", "0daysutilized", "flyingSavage", "Reddit-Wallah", "Outrageous-Memory-20", "Jesse_hu_be", "khalnayakQ", "Slasher856"]
+action: spam
+priority: 1
+action_reason: 'Troll | Spammer | RDT Troller | RDT Comment Deleter'
+---
+## Remove user tagging by certain users to prevent harassment.
+type: comment
+author: [Bottleguard, cyntella_, 0daysutilized]
+body (regex, includes): ['(?<!\bhttps://\w{3}\.reddit\.com/)\bu/([\w-]{3,20})']
+action: remove
+action_reason: "Removed username mention [{{match-2}}]"
+---
+## Linking to other subs by certain users to prevent bigrading
+url+body+title (regex): ["(?<!np\\.)reddit\\.com/r/[^/]+/comments/[\\w%/-]+"]
+author: [deku-kage]
+action: remove
+action_reason: "Possible brigading attempt"
+---
+## Test - Certain words by certain users
+type: comment
+author: [tanashah, short_herpes]
+body (regex, includes): ["himachali*", "m(o|0)chi"]
+action: filter
+action_reason: "Specific user/ words: [{{match}}]"
+---
+### Allow comments only in RDT
+#type: comment
+#parent_submission:
+#    ~title (regex, includes): ['Late Night Random Discussion Thread']
+#author: [blah_blah_shit, Bollywood-Bot]
+#action: remove
+#action_reason: 'Permitted in RDT only'
+---
+##############################################################
+##### AMA Related Stuff
+##############################################################
+---
+### AMA trollers
+type: comment
+~author: [indiasocial]
+parent_submission:
+    flair_template_id: c9270a1a-7d3a-11eb-b832-0e59afdc9805
+body (includes-word, regex): ['banned word']
+action: spam
+action_reason: 'AMA Trollers'
+priority: 2
+---
+### this rules allow AMA host to reply but remove any new comment!  
+####   ===== NOT ACTIVE NOW =====
+#type: comment
+#~author: [subreddit]
+#parent_submission:
+#    flair_template_id: c9270a1a-7d3a-11eb-b832-0e59afdc9805
+#action: remove
+#action_reason: 'Posting after AMA is over'
+#priority: 2
+#message: |
+#     Thank you for the question(s), But the AMA(Ask Me Anything) is over and we are not talking any new questions.
+#
+#     For the Remaining Question, it's upto our Host, to answer them at their convenient time.
+#
+#     **r/subreddit Mod Team**
+---
+### Filter Archived post comments.
+type: comment
+parent_submission:
+    past_archive_date: true
+action: filter
+action_reason: comment on old post from new user
+---
+##############################
+### EXTRA Submission Rules ###
+##############################
+---
+### Survey reminder in new posts!  
+####   ===== NOT ACTIVE NOW =====
+#type: submission
+#moderators_exempt: false
+#comment_stickied: true
+#comment_locked: true
+#comment: |
+#    [India Social Demographic Survey]#(https://www.reddit.com/r/indiasocial/comments/vp2rx2/india_social_demographic_survey_v_20/) is live once again! 
+#    
+#    This survey is about our community and will help us understand the userbase better. Do check it out and participate.
+---
